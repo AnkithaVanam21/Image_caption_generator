@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image Caption Generator</title>
+    <style>
+        body { font-family: Arial; text-align: center; margin-top: 50px; }
+        #result { margin-top: 20px; }
+        img { max-width: 300px; margin: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Upload an Image</h1>
+    <input type="file" id="image" accept="image/*">
+    <button onclick="predict()">Generate Caption</button>
+    <div id="result">
+        <img id="preview" src="" style="display: none;">
+        <p id="caption"></p>
+    </div>
+
+    <script>
+        function predict() {
+            const file = document.getElementById('image').files[0];
+            if (!file) return alert("Please upload an image first!");
+
+            // Preview image
+            const preview = document.getElementById('preview');
+            preview.src = URL.createObjectURL(file);
+            preview.style.display = 'block';
+
+            // Send to Flask backend
+            const formData = new FormData();
+            formData.append('file', file);
+
+            fetch('/predict', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('caption').innerText = data.caption;
+            })
+            .catch(error => console.error(error));
+        }
+    </script>
+</body>
+</html>
